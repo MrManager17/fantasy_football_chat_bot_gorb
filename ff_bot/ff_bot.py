@@ -115,6 +115,32 @@ def get_standings(league, top_half_scoring, week=None):
     text = ['__**Current Standings:**__ '] + standings_txt
     return "\n".join(text)
 
+def get_best_worst_teams(league):
+    # first Place
+    standings = league.standings()
+    first_place = standings[0]
+
+    # best scorer
+    best_scorer = league.top_scorer()
+
+    # Last place
+    standings = league.standings()
+    last_place = standings[-1]
+
+    # least scorer
+    least_scorer = league.least_scorer()
+
+    txt = f"@everyone\n" \
+          f"__**First Place**__\n{users[first_place.team_id]}: {first_place.team_name} {first_place.wins}-{first_place.losses}" \
+          f"\n__**Last Place**__\n{users[last_place.team_id]}: {last_place.team_name} {last_place.wins}-{last_place.losses}" \
+          f"\n__**Top Scorer**__\n{users[best_scorer.team_id]}: {best_scorer.team_name} {best_scorer.points_for}" \
+          f"\n__**Lowest Score**__\n{users[least_scorer.team_id]}: {least_scorer.team_name} {least_scorer.points_for}"
+    if least_scorer.team_id == last_place.team_id:
+        txt += f"\n{users[least_scorer.team_id]} should just give up :poop:"
+    else:
+        txt += f"\n{users[least_scorer.team_id]} and {users[last_place.team_id]} are the worst at fantasy! :poop:"
+    return txt
+
 def top_half_wins(league, top_half_totals, week):
     box_scores = league.box_scores(week=week)
 
@@ -839,7 +865,7 @@ def bot_main(function):
 
     global users
     try:
-        users += os.environ["USERS"].split(',')
+        users += os.environ["USERS"].strip("\"").split(',')
     except KeyError:
         users += [''] * league.teams[-1].team_id
 
@@ -956,6 +982,8 @@ if __name__ == '__main__':
     sched.add_job(bot_main, 'cron', ['get_inactives'], id='inactives',
         day_of_week='sat', hour=20, start_date=ff_start_date, end_date=ff_end_date,
         timezone=game_timezone, replace_existing=True)
+    sched.add_job(bot_main, 'cron', ['get_best_worst_teams'], id="best_worst",
+                  day_of_week="tue", hour=7, minute=0, start_date=ff_start_date, end_date=ff_end_date)
 
     #schedule without a COVID delay:
     #score update:                       friday and monday morning at 7:30am local time.
