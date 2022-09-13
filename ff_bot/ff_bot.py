@@ -922,6 +922,7 @@ def bot_main(function):
         week = league.current_week - 1
         text = get_scoreboard_short(league, week=week)
         text = text + "\n\n" + get_trophies(league, extra_trophies, week=week)
+        text = text + "\n\n" + get_best_worst_teams(league)
     elif function=="init":
         try:
             text = os.environ["INIT_MSG"]
@@ -982,8 +983,6 @@ if __name__ == '__main__':
     sched.add_job(bot_main, 'cron', ['get_inactives'], id='inactives',
         day_of_week='sat', hour=20, start_date=ff_start_date, end_date=ff_end_date,
         timezone=game_timezone, replace_existing=True)
-    sched.add_job(bot_main, 'cron', ['get_best_worst_teams'], id="best_worst",
-                  day_of_week="tue", hour=7, minute=0, start_date=ff_start_date, end_date=ff_end_date)
 
     #schedule without a COVID delay:
     #score update:                       friday and monday morning at 7:30am local time.
