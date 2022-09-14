@@ -130,16 +130,36 @@ def get_best_worst_teams(league):
     # least scorer
     least_scorer = league.least_scorer()
 
-    txt = f"@everyone\n" \
-          f"__**First Place**__\n{users[first_place.team_id]}: {first_place.team_name} {first_place.wins}-{first_place.losses}" \
+    txt = f"__**First Place**__\n{users[first_place.team_id]}: {first_place.team_name} {first_place.wins}-{first_place.losses}" \
           f"\n__**Last Place**__\n{users[last_place.team_id]}: {last_place.team_name} {last_place.wins}-{last_place.losses}" \
           f"\n__**Top Scorer**__\n{users[best_scorer.team_id]}: {best_scorer.team_name} {best_scorer.points_for}" \
           f"\n__**Lowest Score**__\n{users[least_scorer.team_id]}: {least_scorer.team_name} {least_scorer.points_for}"
     if least_scorer.team_id == last_place.team_id:
-        txt += f"\n{users[least_scorer.team_id]} should just give up :poop:"
+        txt += f"\n\n{users[least_scorer.team_id]} should just give up :poop:"
     else:
         txt += f"\n{users[least_scorer.team_id]} and {users[last_place.team_id]} are the worst at fantasy! :poop:"
     return txt
+
+def get_power_rankings_assignment(league, week):
+    box_scores = league.box_scores(week=week)
+    largest_score = 0
+    largest_team = None
+    for score in box_scores:
+        if score.home_score > largest_score:
+            largest_score = score.home_score
+            largest_team = score.home_team
+        if score.away_score > largest_score:
+            largest_score = score.away_score
+            largest_team = score.away_team
+
+    txt = f"__**POWER RANKINGS ASSIGNMENT**__\n" \
+          f"With an week {week} score of **{largest_score}**\n" \
+          f"{users[largest_team.team_id]} **{largest_team.team_name}** is given " \
+          f"the glorious and honorable task of drafting power rankings for " \
+          f"week {week+1}"
+
+    return txt
+
 
 def top_half_wins(league, top_half_totals, week):
     box_scores = league.box_scores(week=week)
@@ -923,6 +943,7 @@ def bot_main(function):
         text = get_scoreboard_short(league, week=week)
         text = text + "\n\n" + get_trophies(league, extra_trophies, week=week)
         text = text + "\n\n" + get_best_worst_teams(league)
+        text = text + "\n\n" + get_power_rankings_assignment(league, week)
     elif function=="init":
         try:
             text = os.environ["INIT_MSG"]
@@ -932,7 +953,15 @@ def bot_main(function):
     else:
         text = "Something happened. HALP"
 
+    gorbisms = [
+        "*So Sayeth Gorb*",
+        "*All Praise be Unto Gorb*",
+        "*Gorb Gibber of Swegma*",
+        "*We are all his cincochildren*",
+        "*Thus Sayeth the Gorb*"
+    ]
     if text != '' and not test:
+        text += f"\n\n   - {random.choice(gorbisms)}"
         messages = str_limit_check(text, str_limit)
         for message in messages:
             discord_bot.send_message(message)
