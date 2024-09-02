@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from gamedaybot.espn.env_vars import get_env_vars
@@ -64,7 +65,7 @@ def scheduler():
         day_of_week='thu', hour=18, minute=30, second=3, start_date=ff_start_date, end_date=ff_end_date,
         timezone=game_timezone, replace_existing=True)
 
-    sched.add_job(espn_bot, 'cron', ['get_heads_up'], id='headsup',
+    sched.add_job(espn_bot, 'cron', ['get_monitor'], id='_monitor',
         day_of_week='fri', hour=18, minute=30, start_date=ff_start_date, end_date=ff_end_date,
         timezone=my_timezone, replace_existing=True)
 
@@ -79,15 +80,15 @@ def scheduler():
     sched.add_job(espn_bot, 'cron', ['get_close_scores'], id='close_scores',
         day_of_week='sun,mon', hour=18, minute=30, start_date=ff_start_date, end_date=ff_end_date,
         timezone=game_timezone, replace_existing=True)
+    
+    sched.add_job(espn_bot, 'cron', ['get_waiver_report'], id='waiver_report',
+            day_of_week='wed', hour=7, minute=31, start_date=ff_start_date, end_date=ff_end_date,
+            timezone=my_timezone, replace_existing=True)  
 
     if data['daily_waiver']:
         sched.add_job(espn_bot, 'cron', ['get_waiver_report'], id='waiver_report',
-            day_of_week='wed,thu,fri,sat,sun', hour=6, minute=30, start_date=ff_start_date, end_date=ff_end_date,
-            timezone=my_timezone, replace_existing=True)  
-    else:
-        sched.add_job(espn_bot, 'cron', ['get_waiver_report'], id='waiver_report',
-            day_of_week='wed', hour=6, minute=30, start_date=ff_start_date, end_date=ff_end_date,
-            timezone=my_timezone, replace_existing=True)  
+            day_of_week='mon,tue,thu,fri,sat,sun', hour=7, minute=31, start_date=ff_start_date, end_date=ff_end_date,
+            timezone=my_timezone, replace_existing=True)        
 
     sched.add_job(espn_bot, 'date', ['season_trophies'], id='season_trophies',
         run_date=datetime(end_date.year, end_date.month, end_date.day, 7, 30), 
@@ -100,4 +101,5 @@ def scheduler():
         ready_text += " SWID and ESPN_S2 not provided."
 
     print(ready_text)
+    logging.info(ready_text)
     sched.start()

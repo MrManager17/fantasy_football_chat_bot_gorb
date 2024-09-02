@@ -1,5 +1,5 @@
 import os
-import gamedaybot.utils as utils
+import gamedaybot.utils.util as util
 
 
 def get_env_vars():
@@ -7,14 +7,14 @@ def get_env_vars():
     try:
         ff_start_date = os.environ["START_DATE"]
     except KeyError:
-        ff_start_date = '2023-09-04'
+        ff_start_date = '2024-09-05'
 
     data['ff_start_date'] = ff_start_date
 
     try:
         ff_end_date = os.environ["END_DATE"]
     except KeyError:
-        ff_end_date = '2024-01-09'
+        ff_end_date = '2025-01-05'
 
     data['ff_end_date'] = ff_end_date
 
@@ -26,14 +26,14 @@ def get_env_vars():
     data['my_timezone'] = my_timezone
 
     try:
-        daily_waiver = utils.str_to_bool(os.environ["DAILY_WAIVER"])
+        daily_waiver = util.str_to_bool(os.environ["DAILY_WAIVER"])
     except KeyError:
         daily_waiver = False
 
     data['daily_waiver'] = daily_waiver
 
     try:
-        monitor_report = utils.str_to_bool(os.environ["MONITOR_REPORT"])
+        monitor_report = util.str_to_bool(os.environ["MONITOR_REPORT"])
     except KeyError:
         monitor_report = True
 
@@ -54,7 +54,7 @@ def get_env_vars():
 
     try:
         discord_webhook_url = os.environ["DISCORD_WEBHOOK_URL"]
-        str_limit = 3000
+        str_limit = 2000
     except KeyError:
         discord_webhook_url = 1
 
@@ -63,8 +63,7 @@ def get_env_vars():
             len(str(discord_webhook_url)) <= 1):
         # Ensure that there's info for at least one messaging platform,
         # use length of str in case of blank but non null env variable
-        raise Exception("No messaging platform info provided. Be sure one of BOT_ID,\
-                        SLACK_WEBHOOK_URL, or DISCORD_WEBHOOK_URL env variables are set")
+        raise Exception("No messaging platform info provided. Be sure one of BOT_ID, SLACK_WEBHOOK_URL, or DISCORD_WEBHOOK_URL env variables are set")
 
     data['str_limit'] = str_limit
     data['bot_id'] = bot_id
@@ -76,7 +75,7 @@ def get_env_vars():
     try:
         year = int(os.environ["LEAGUE_YEAR"])
     except KeyError:
-        year = 2023
+        year = 2024
 
     data['year'] = year
 
@@ -100,14 +99,14 @@ def get_env_vars():
     data['espn_s2'] = espn_s2
 
     try:
-        test = utils.str_to_bool(os.environ["TEST"])
+        test = util.str_to_bool(os.environ["TEST"])
     except KeyError:
         test = False
 
     data['test'] = test
 
     try:
-        top_half_scoring = utils.str_to_bool(os.environ["TOP_HALF_SCORING"])
+        top_half_scoring = util.str_to_bool(os.environ["TOP_HALF_SCORING"])
     except KeyError:
         top_half_scoring = False
 
@@ -116,14 +115,14 @@ def get_env_vars():
     data['random_phrase'] = get_random_phrase()
 
     try:
-        waiver_report = utils.str_to_bool(os.environ["WAIVER_REPORT"])
+        waiver_report = util.str_to_bool(os.environ["WAIVER_REPORT"])
     except KeyError:
         waiver_report = False
 
     data['waiver_report'] = waiver_report
 
     try:
-        extra_trophies = utils.str_to_bool(os.environ["EXTRA_TROPHIES"])
+        extra_trophies = util.str_to_bool(os.environ["EXTRA_TROPHIES"])
     except KeyError:
         extra_trophies = False
 
@@ -148,7 +147,7 @@ def get_env_vars():
 def get_random_phrase():
     random_phrase = False
     try:
-        random_phrase = utils.str_to_bool(os.environ["RANDOM_PHRASE"])
+        random_phrase = util.str_to_bool(os.environ["RANDOM_PHRASE"])
     except KeyError:
         random_phrase = False
 
